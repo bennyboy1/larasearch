@@ -18,18 +18,12 @@ class Results extends Collection {
      *
      * @param Response $response
      */
-    public function __construct(Response $response)
+    public function __construct(Collection $response)
     {
         $this->response = $response;
 
         parent::__construct(
-            array_map(
-                function ($hit)
-                {
-                    return new Result($hit);
-                },
-                $this->response->getHits()
-            )
+            $this->response
         );
     }
 
