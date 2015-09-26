@@ -16,9 +16,9 @@ class Results extends Collection {
      * Construct a collection of Result objects based on the hits
      * in the Elasticsearch response
      *
-     * @param Response $response
+     * @param $response
      */
-    public function __construct(Collection $response)
+    public function __construct($response)
     {
         $this->response = $response;
 
