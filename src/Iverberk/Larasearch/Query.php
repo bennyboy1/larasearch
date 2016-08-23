@@ -283,6 +283,12 @@ class Query {
                 $payload = ['dis_max' => ['queries' => $queries]];
             }
 
+            if ($filters = Utils::findKey($this->options, 'filters', false)) {
+                $filteredPayload = $filters;
+                $filteredPayload['filtered']['query'] = $payload;
+                $payload = $filteredPayload;
+            }
+
             $this->payload['query'] = $payload;
         } else
         {
