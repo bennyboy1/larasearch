@@ -48,7 +48,7 @@ class Response {
      */
     public function getResults()
     {
-        return new Results($this);
+        return new Results($this->getRecords());
     }
 
     /**
