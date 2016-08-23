@@ -51,17 +51,8 @@ class Query {
      */
     private function getAggregations()
     {
-        if ($aggregations = Utils::findKey($this->options, 'aggs', false))
-        {
-            foreach ($aggregations as $name => $aggregation)
-            {
-                switch ($aggregation['type'])
-                {
-                    case 'terms':
-                        $this->payload['aggs'][$name]['terms'] = ['field' => $aggregation['field'], 'size' => 0];
-                        break;
-                }
-            }
+        if ($aggregations = Utils::findKey($this->options, 'aggs', false)) {
+            $this->payload['aggs'] = $aggregations;
         }
     }
 
