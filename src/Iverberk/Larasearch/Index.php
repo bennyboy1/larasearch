@@ -68,48 +68,56 @@ class Index {
      * @param callable $callback
      * @internal param $type
      */
-    public function import(Model $model, $relations = [], $batchSize = 750, Callable $callback = null)
+    public function import(Model $model, $relations = [], $batchSize = 750, callable $callback = null)
     {
         $batch = 0;
 
-        while (true)
-        {
-            // Increase the batch number
+        while (true) {
             $batch += 1;
 
-            // Load records from the database
-            $records = $model
-                ->with($relations)
-                ->skip($batchSize * ($batch - 1))
-                ->take($batchSize)
-                ->get();
+            $finished = $this->importBatch($model, $relations, $batchSize, $callback, $batch);
 
-            // Break out of the loop if we are out of records
-            if (count($records) == 0) break;
-
-            // Call the callback function to provide feedback on the import process
-            if ($callback)
-            {
-                $callback($batch);
+            if ($finished) {
+                break;
             }
-
-            // Transform each record before sending it to Elasticsearch
-            $data = [];
-
-            foreach ($records as $record)
-            {
-                $data[] = [
-                    'index' => [
-                        '_id' => $record->getEsId()
-                    ]
-                ];
-
-                $data[] = $record->transform(!empty($relations));
-            }
-
-            // Bulk import the data to Elasticsearch
-            $this->bulk($data);
         }
+    }
+
+    protected function importBatch($model, $relations, $batchSize, $callback, $batch)
+    {
+        // Load records from the database
+        $records = $model
+            ->with($relations)
+            ->skip($batchSize * ($batch - 1))
+            ->take($batchSize)
+            ->get();
+
+        // Break out of the loop if we are out of records
+        if (count($records) == 0) {
+            return true;
+        }
+
+        // Call the callback function to provide feedback on the import process
+        if ($callback) {
+            $callback($batch);
+        }
+
+        // Transform each record before sending it to Elasticsearch
+        $data = [];
+        foreach ($records as $record) {
+            $data[] = [
+                'index' => [
+                    '_id' => $record->id
+                ]
+            ];
+
+            $data[] = $record->transform(!empty($relations));
+        }
+
+        // Bulk import the data to Elasticsearch
+        $this->bulk($data);
+
+        return false;
     }
 
     /**
