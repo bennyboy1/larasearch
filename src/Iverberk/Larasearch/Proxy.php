@@ -196,7 +196,7 @@ class Proxy {
      */
     public function refreshDoc($model)
     {
-        $relations = $relations ? Config::get('larasearch.paths.' . get_class($model)) : [];
+        $relations = Config::get('larasearch.paths.' . get_class($model), []);
         $model->load($relations);
 
         $this->config['client']->index(
