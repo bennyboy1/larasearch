@@ -1,6 +1,6 @@
 <?php namespace Iverberk\Larasearch;
 
-use Elasticsearch\Client;
+use Elasticsearch\ClientBuilder;
 use Illuminate\Support\ServiceProvider;
 use Iverberk\Larasearch\Commands\PathsCommand;
 use Iverberk\Larasearch\Commands\ReindexCommand;
@@ -79,7 +79,7 @@ class LarasearchServiceProvider extends ServiceProvider
     {
         $this->app->singleton('Elasticsearch', function ($app)
         {
-            return new Client(\Illuminate\Support\Facades\Config::get('larasearch.elasticsearch.params'));
+            return ClientBuilder::fromConfig(\Illuminate\Support\Facades\Config::get('larasearch.elasticsearch.params'));
         });
     }
 
