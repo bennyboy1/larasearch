@@ -132,14 +132,14 @@ class Proxy {
         $index = App::make('iverberk.larasearch.index', array('name' => $newName, 'proxy' => $this));
         $index->create($mapping);
 
+        $actions = [];
         if ($index->aliasExists($name))
         {
             $index->import($model, $relations, $batchSize, $callback);
-            $remove = [];
 
             foreach (Index::getAlias($name) as $index => $aliases)
             {
-                $remove = [
+                $actions[] = [
                     'remove' => [
                         'index' => $index,
                         'alias' => $name
@@ -147,28 +147,24 @@ class Proxy {
                 ];
             }
 
-            $add = [
+            $actions[] = [
                 'add' => [
                     'index' => $newName,
                     'alias' => $name
                 ]
             ];
 
-            $actions[] = array_merge($remove, $add);
-
             Index::updateAliases(['actions' => $actions]);
             Index::clean($name);
-        } else
-        {
+        } else {
             if ($this->config['index']->exists()) $this->config['index']->delete();
 
-            $actions[] =
-                [
-                    'add' => [
-                        'index' => $newName,
-                        'alias' => $name
-                    ]
-                ];
+            $actions[] = [
+                'add' => [
+                    'index' => $newName,
+                    'alias' => $name
+                ]
+            ];
 
             Index::updateAliases([
                 'actions' => $actions
